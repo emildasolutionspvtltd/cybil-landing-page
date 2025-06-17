@@ -212,7 +212,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                   <label htmlFor="phone" className="text-xs font-medium">
                     Phone Number *
                   </label>
-                  <div className="flex space-x-2">
+                  <div className="flex space-x-2 z-10">
                     <Select value={countryCode} onValueChange={setCountryCode}>
                       <SelectTrigger className="w-1/4 text-xs h-9">
                         <SelectValue placeholder="Code" />
