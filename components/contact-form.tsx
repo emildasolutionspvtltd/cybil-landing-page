@@ -1,93 +1,67 @@
 "use client";
 
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { useToast } from "@/hooks/use-toast";
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { useToast } from '@/hooks/use-toast';
 
 type ContactFormProps = {
   onSuccess?: () => void;
 };
 
-/* ---------------------- country codes list (unchanged) --------------------- */
+/* ---------------------- country codes list (cleaned) --------------------- */
 const countryCodes = [
-  { code: "+1", country: "USA" },
-  { code: "+44", country: "UK" },
-  { code: "+971", country: "UAE" },
-  { code: "+91", country: "India" },
-  { code: "+61", country: "Australia" },
-  { code: "+33", country: "France" },
-  { code: "+49", country: "Germany" },
-  { code: "+81", country: "Japan" },
-  { code: "+55", country: "Brazil" },
-  { code: "+34", country: "Spain" },
-  { code: "+7", country: "Russia" },
-  { code: "+39", country: "Italy" },
-  { code: "+34", country: "Spain" },
-  { code: "+82", country: "South Korea" },
-  { code: "+52", country: "Mexico" },
-  { code: "+20", country: "Egypt" },
-  { code: "+27", country: "South Africa" },
-  { code: "+86", country: "China" },
-  { code: "+61", country: "Australia" },
-  { code: "+30", country: "Greece" },
-  { code: "+34", country: "Spain" },
-  { code: "+62", country: "Indonesia" },
-  { code: "+91", country: "India" },
-  { code: "+45", country: "Denmark" },
-  { code: "+47", country: "Norway" },
-  { code: "+48", country: "Poland" },
-  { code: "+41", country: "Switzerland" },
-  { code: "+31", country: "Netherlands" },
-  { code: "+32", country: "Belgium" },
-  { code: "+353", country: "Ireland" },
-  { code: "+46", country: "Sweden" },
-  { code: "+55", country: "Brazil" },
-  { code: "+56", country: "Chile" },
-  { code: "+57", country: "Colombia" },
-  { code: "+58", country: "Venezuela" },
-  { code: "+60", country: "Malaysia" },
-  { code: "+63", country: "Philippines" },
-  { code: "+64", country: "New Zealand" },
-  { code: "+98", country: "Iran" },
-  { code: "+66", country: "Thailand" },
-  { code: "+90", country: "Turkey" },
-  { code: "+94", country: "Sri Lanka" },
-  { code: "+971", country: "UAE" },
-  { code: "+1", country: "Canada" },
-  { code: "+351", country: "Portugal" },
-  { code: "+30", country: "Greece" },
-  { code: "+974", country: "Qatar" },
-  { code: "+974", country: "Qatar" },
-  { code: "+52", country: "Mexico" },
-  { code: "+55", country: "Brazil" },
-  { code: "+351", country: "Portugal" },
-  { code: "+254", country: "Kenya" },
-  { code: "+254", country: "Kenya" },
-  { code: "+213", country: "Algeria" },
-  { code: "+234", country: "Nigeria" },
-  { code: "+93", country: "Afghanistan" },
-  { code: "+880", country: "Bangladesh" },
-  { code: "+251", country: "Ethiopia" },
-  { code: "+963", country: "Syria" },
-  { code: "+971", country: "UAE" },
-  { code: "+971", country: "UAE" },
+  { code: "+1", country: "USA/Canada", id: "us-ca" },
+  { code: "+44", country: "UK", id: "uk" },
+  { code: "+971", country: "UAE", id: "uae" },
+  { code: "+91", country: "India", id: "india" },
+  { code: "+61", country: "Australia", id: "australia" },
+  { code: "+33", country: "France", id: "france" },
+  { code: "+49", country: "Germany", id: "germany" },
+  { code: "+81", country: "Japan", id: "japan" },
+  { code: "+55", country: "Brazil", id: "brazil" },
+  { code: "+34", country: "Spain", id: "spain" },
+  { code: "+7", country: "Russia", id: "russia" },
+  { code: "+39", country: "Italy", id: "italy" },
+  { code: "+82", country: "South Korea", id: "south-korea" },
+  { code: "+52", country: "Mexico", id: "mexico" },
+  { code: "+20", country: "Egypt", id: "egypt" },
+  { code: "+27", country: "South Africa", id: "south-africa" },
+  { code: "+86", country: "China", id: "china" },
+  { code: "+30", country: "Greece", id: "greece" },
+  { code: "+62", country: "Indonesia", id: "indonesia" },
+  { code: "+45", country: "Denmark", id: "denmark" },
+  { code: "+47", country: "Norway", id: "norway" },
+  { code: "+48", country: "Poland", id: "poland" },
+  { code: "+41", country: "Switzerland", id: "switzerland" },
+  { code: "+31", country: "Netherlands", id: "netherlands" },
+  { code: "+32", country: "Belgium", id: "belgium" },
+  { code: "+353", country: "Ireland", id: "ireland" },
+  { code: "+46", country: "Sweden", id: "sweden" },
+  { code: "+56", country: "Chile", id: "chile" },
+  { code: "+57", country: "Colombia", id: "colombia" },
+  { code: "+58", country: "Venezuela", id: "venezuela" },
+  { code: "+60", country: "Malaysia", id: "malaysia" },
+  { code: "+63", country: "Philippines", id: "philippines" },
+  { code: "+64", country: "New Zealand", id: "new-zealand" },
+  { code: "+98", country: "Iran", id: "iran" },
+  { code: "+66", country: "Thailand", id: "thailand" },
+  { code: "+90", country: "Turkey", id: "turkey" },
+  { code: "+94", country: "Sri Lanka", id: "sri-lanka" },
+  { code: "+351", country: "Portugal", id: "portugal" },
+  { code: "+974", country: "Qatar", id: "qatar" },
+  { code: "+254", country: "Kenya", id: "kenya" },
+  { code: "+213", country: "Algeria", id: "algeria" },
+  { code: "+234", country: "Nigeria", id: "nigeria" },
+  { code: "+93", country: "Afghanistan", id: "afghanistan" },
+  { code: "+880", country: "Bangladesh", id: "bangladesh" },
+  { code: "+251", country: "Ethiopia", id: "ethiopia" },
+  { code: "+963", country: "Syria", id: "syria" },
 ];
 
-/* -------------------- helper to url-encode form payload -------------------- */
-const encode = (data: Record<string, string>) =>
-  Object.keys(data)
-    .map(
-      (key) => encodeURIComponent(key) + "=" + encodeURIComponent(data[key])
-    )
-    .join("&");
+
+
 
 export default function ContactForm({ onSuccess }: ContactFormProps) {
   const { toast } = useToast();
@@ -104,30 +78,42 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
 
     const form = e.target as HTMLFormElement;
 
-    const data = {
+    // Format data properly for SheetDB
+    const formData = {
       "form-name": "contact", // Netlify form identifier
       firstName: form.firstName.value.trim(),
       email: form.email.value.trim(),
-      phone: `${countryCode} ${form.phone.value.trim()}`,
+      // Format phone number as text with a single quote prefix to prevent formula errors
+      phone: `'${countryCode} ${form.phone.value.trim()}`,
       description: form.description.value.trim(),
     };
 
     try {
-      /* ------------- Send payload to Netlify backend (relative path) ------------- */
-      await fetch("/", {
+      // Submit to SheetDB with proper formatting
+      const res = await fetch("https://sheetdb.io/api/v1/xs57v33d00wiy", {
         method: "POST",
-        headers: { "Content-Type": "application/x-www-form-urlencoded" },
-        body: encode(data),
+        headers: {
+          "Content-Type": "application/json",
+          "Accept": "application/json"
+        },
+        body: JSON.stringify({ data: formData }),
       });
 
-      toast({
-        title: "Form submitted successfully!",
-        description:
-          "We'll contact you shortly to discuss your business needs.",
-      });
-      form.reset();
-      setFormSubmitted(true);
-      onSuccess?.();
+      const result = await res.json();
+      console.log('Response:', result); // Debug log
+
+      if (res.ok && result?.created) {
+        toast({
+          title: "Form submitted successfully!",
+          description: "We'll contact you shortly to discuss your business needs.",
+        });
+        form.reset();
+        setFormSubmitted(true);
+        if (onSuccess) onSuccess();
+      } else {
+        console.error('API Error:', result);
+        throw new Error(result?.error || result?.message || "Something went wrong");
+      }
     } catch (error: any) {
       toast({
         title: "Error submitting form!",
@@ -138,6 +124,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
       setIsSubmitting(false);
     }
   };
+
 
   /* ------------------------------------------------------------------------ */
   /*                                 RENDER                                   */
@@ -173,6 +160,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                 netlify-honeypot="bot-field"
                 onSubmit={handleSubmit}
                 className="space-y-3 sm:space-y-4"
+                
               >
                 {/* hidden inputs Netlify needs */}
                 <input type="hidden" name="form-name" value="contact" />
@@ -212,15 +200,15 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
                   <label htmlFor="phone" className="text-xs font-medium">
                     Phone Number *
                   </label>
-                  <div className="flex space-x-2 z-10">
+                  <div className="flex space-x-2">
                     <Select value={countryCode} onValueChange={setCountryCode}>
                       <SelectTrigger className="w-1/4 text-xs h-9">
                         <SelectValue placeholder="Code" />
                       </SelectTrigger>
                       <SelectContent>
-                        {countryCodes.map(({ code, country }) => (
+                        {countryCodes.map(({ code, country, id }) => (
                           <SelectItem
-                            key={code + country}
+                            key={id}
                             value={code}
                             className="text-xs"
                           >
