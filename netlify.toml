@@ -1,0 +1,29 @@
+[build]
+  publish = "out"
+  command = "npm run build"
+
+[build.environment]
+  NODE_VERSION = "18"
+
+# Form handling configuration
+[[forms]]
+  name = "contact"
+
+# Redirect rules
+[[redirects]]
+  from = "/thank-you"
+  to = "/"
+  status = 200
+
+# Headers for security
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    X-Content-Type-Options = "nosniff"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+
+# Form notifications - Configure these in Netlify dashboard
+# Go to Site settings > Forms > Form notifications
+# Add email notification with your desired email address

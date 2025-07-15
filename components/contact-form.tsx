@@ -77,47 +77,59 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
     setIsSubmitting(true);
 
     const form = e.target as HTMLFormElement;
+    const formData = new FormData(form);
 
-    // Format data properly for SheetDB
-    const formData = {
-      "form-name": "contact", // Netlify form identifier
-      firstName: form.firstName.value.trim(),
-      email: form.email.value.trim(),
-      // Format phone number as text with a single quote prefix to prevent formula errors
-      phone: `'${countryCode} ${form.phone.value.trim()}`,
-      description: form.description.value.trim(),
-    };
+    // Add the country code to the form data
+    formData.set('phone', `${countryCode} ${formData.get('phone')}`);
 
     try {
-      // Submit to SheetDB with proper formatting
-      const res = await fetch("https://sheetdb.io/api/v1/xs57v33d00wiy", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Accept": "application/json"
-        },
-        body: JSON.stringify({ data: formData }),
-      });
+      console.log('Submitting form data:', Object.fromEntries(formData));
 
-      const result = await res.json();
-      console.log('Response:', result); // Debug log
+      // Check if we're in development mode
+      const isDevelopment = process.env.NODE_ENV === 'development' || window.location.hostname === 'localhost';
 
-      if (res.ok && result?.created) {
+      if (isDevelopment) {
+        // Simulate form submission in development
+        console.log('Development mode: Simulating form submission');
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Simulate network delay
+
         toast({
-          title: "Form submitted successfully!",
+          title: "Form submitted successfully! (Development Mode)",
           description: "We'll contact you shortly to discuss your business needs.",
         });
         form.reset();
         setFormSubmitted(true);
         if (onSuccess) onSuccess();
       } else {
-        console.error('API Error:', result);
-        throw new Error(result?.error || result?.message || "Something went wrong");
+        // Submit to Netlify Forms in production
+        const response = await fetch('/', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: new URLSearchParams(formData as any).toString(),
+        });
+
+        console.log('Response status:', response.status);
+        console.log('Response ok:', response.ok);
+
+        if (response.ok) {
+          toast({
+            title: "Form submitted successfully!",
+            description: "We'll contact you shortly to discuss your business needs.",
+          });
+          form.reset();
+          setFormSubmitted(true);
+          if (onSuccess) onSuccess();
+        } else {
+          const errorText = await response.text();
+          console.error('Response error:', errorText);
+          throw new Error(`Form submission failed: ${response.status}`);
+        }
       }
     } catch (error: any) {
+      console.error('Form submission error:', error);
       toast({
         title: "Error submitting form!",
-        description: error?.message || "Something went wrong.",
+        description: error?.message || "Something went wrong. Please try again.",
         variant: "destructive",
       });
     } finally {
@@ -129,131 +141,107 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
   /* ------------------------------------------------------------------------ */
   /*                                 RENDER                                   */
   /* ------------------------------------------------------------------------ */
-  return (
-    <section
-      id="contact"
-      className="py-4 sm:py-6 bg-gray-50 flex items-center justify-center"
-    >
-      <div className="max-w-md mx-auto w-full px-3 sm:px-4">
-        {formSubmitted ? (
-          <div className="text-center p-3 sm:p-4">
-            <h3 className="text-sm sm:text-base font-semibold">Thank you!</h3>
-            <p className="mt-1 text-xs sm:text-sm">
-              We'll contact you shortly to discuss your business needs.
-            </p>
-          </div>
-        ) : (
-          <>
-            <h2 className="section-title text-center mb-1 text-sm sm:text-base">
-              Need Help?
-            </h2>
-            <p className="text-center text-xs sm:text-sm mb-3 sm:mb-4">
-              Get a Callback in just a Minute. Just drop your number below!
-            </p>
 
-            <div className="bg-white p-3 sm:p-4 rounded-xl shadow-md">
-              {/* ---------------------------- Netlify form --------------------------- */}
-              <form
-                name="contact"
-                method="POST"
-                data-netlify="true"
-                netlify-honeypot="bot-field"
-                onSubmit={handleSubmit}
-                className="space-y-3 sm:space-y-4"
-                
+  // Show success message if form was submitted successfully
+  if (formSubmitted) {
+    return (
+      <section id="contact" className="py-4 sm:py-6 bg-gray-50 flex items-center justify-center">
+        <div className="max-w-md mx-auto w-full px-3 sm:px-4">
+          <div className="bg-white p-6 sm:p-8 rounded-xl shadow-md text-center">
+            <div className="mb-4">
+              <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                <svg className="w-8 h-8 text-green-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+              <h3 className="text-lg font-semibold text-gray-900 mb-2">Thank You!</h3>
+              <p className="text-sm text-gray-600 mb-4">
+                Your message has been sent successfully. We'll contact you shortly to discuss your business needs.
+              </p>
+              <button
+                onClick={() => setFormSubmitted(false)}
+                className="text-sm text-blue-600 hover:text-blue-800 underline"
               >
-                {/* hidden inputs Netlify needs */}
-                <input type="hidden" name="form-name" value="contact" />
-                <input type="hidden" name="bot-field" />
-
-                {/* Name Field */}
-                <div className="space-y-1">
-                  <label htmlFor="firstName" className="text-xs font-medium">
-                    Name *
-                  </label>
-                  <Input
-                    id="firstName"
-                    name="firstName"
-                    placeholder="Enter your full name"
-                    required
-                    className="text-sm h-9"
-                  />
-                </div>
-
-                {/* Email Field */}
-                <div className="space-y-1">
-                  <label htmlFor="email" className="text-xs font-medium">
-                    Email Address *
-                  </label>
-                  <Input
-                    id="email"
-                    name="email"
-                    type="email"
-                    placeholder="Enter your email"
-                    required
-                    className="text-sm h-9"
-                  />
-                </div>
-
-                {/* Phone Field */}
-                <div className="space-y-1">
-                  <label htmlFor="phone" className="text-xs font-medium">
-                    Phone Number *
-                  </label>
-                  <div className="flex space-x-2">
-                    <Select value={countryCode} onValueChange={setCountryCode}>
-                      <SelectTrigger className="w-1/4 text-xs h-9">
-                        <SelectValue placeholder="Code" />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {countryCodes.map(({ code, country, id }) => (
-                          <SelectItem
-                            key={id}
-                            value={code}
-                            className="text-xs"
-                          >
-                            {country} ({code})
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                    <Input
-                      id="phone"
-                      name="phone"
-                      placeholder="Enter phone number"
-                      required
-                      className="w-3/4 text-sm h-9"
-                    />
-                  </div>
-                </div>
-
-                {/* Description Field */}
-                <div className="space-y-1">
-                  <label htmlFor="description" className="text-xs font-medium">
-                    Description (optional)
-                  </label>
-                  <textarea
-                    id="description"
-                    name="description"
-                    placeholder="Additional details or questions"
-                    className="w-full h-16 p-2 text-sm border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-                  ></textarea>
-                </div>
-
-                {/* Submit Button */}
-                <div className="pt-2">
-                  <Button
-                    type="submit"
-                    className="gold-btn w-full py-2 text-sm font-medium hover:bg-[#f5d88a] transition-colors duration-200"
-                    disabled={isSubmitting}
-                  >
-                    {isSubmitting ? "Submitting..." : "Get a Call Now"}
-                  </Button>
-                </div>
-              </form>
+                Send another message
+              </button>
             </div>
-          </>
-        )}
+          </div>
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section id="contact" className="py-4 sm:py-6 bg-gray-50 flex items-center justify-center">
+      <div className="max-w-md mx-auto w-full px-3 sm:px-4">
+        <h2 className="section-title text-center mb-1 text-sm sm:text-base">Need Help?</h2>
+        <p className="text-center text-xs sm:text-sm mb-3 sm:mb-4">
+          Get a Callback in just a Minute. Just drop your number below!
+        </p>
+
+        <div className="bg-white p-3 sm:p-4 rounded-xl shadow-md">
+          <form
+            name="contact"
+            method="POST"
+            data-netlify="true"
+            netlify-honeypot="bot-field"
+            onSubmit={handleSubmit}
+            className="space-y-3 sm:space-y-4"
+          >
+            <input type="hidden" name="form-name" value="contact" />
+            <input type="hidden" name="bot-field" />
+
+            <div className="space-y-1">
+              <label htmlFor="firstName" className="text-xs font-medium">Name *</label>
+              <Input id="firstName" name="firstName" placeholder="Enter your full name" required className="text-sm h-9" />
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="email" className="text-xs font-medium">Email Address *</label>
+              <Input id="email" name="email" type="email" placeholder="Enter your email" required className="text-sm h-9" />
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="phone" className="text-xs font-medium">Phone Number *</label>
+              <div className="flex space-x-2">
+                <Select value={countryCode} onValueChange={setCountryCode}>
+                  <SelectTrigger className="w-1/4 text-xs h-9">
+                    <SelectValue placeholder="Code" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {countryCodes.map(({ code, country, id }) => (
+                      <SelectItem key={id} value={code} className="text-xs">
+                        {country} ({code})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                <Input id="phone" name="phone" placeholder="Enter phone number" required className="w-3/4 text-sm h-9" />
+              </div>
+              <input type="hidden" name="countryCode" value={countryCode} />
+            </div>
+
+            <div className="space-y-1">
+              <label htmlFor="description" className="text-xs font-medium">Description (optional)</label>
+              <textarea
+                id="description"
+                name="description"
+                placeholder="Additional details or questions"
+                className="w-full h-16 p-2 text-sm border border-gray-300 rounded-md resize-none focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+              ></textarea>
+            </div>
+
+            <div className="pt-2">
+              <Button
+                type="submit"
+                disabled={isSubmitting}
+                className="gold-btn w-full py-2 text-sm font-medium hover:bg-[#f5d88a] transition-colors duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isSubmitting ? "Submitting..." : "Get a Call Now"}
+              </Button>
+            </div>
+          </form>
+        </div>
       </div>
     </section>
   );
