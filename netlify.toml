@@ -1,5 +1,5 @@
 [build]
-  publish = "out/landing"
+  publish = "out"
   command = "npm run build"
 
 [build.environment]
