@@ -4,7 +4,6 @@ import { Poppins, Open_Sans } from 'next/font/google';
 import { ThemeProvider } from '@/components/theme-provider';
 import { Toaster } from '@/components/ui/toaster';
 import Script from 'next/script';
-// import FloatingCTA from '@/components/floating-cta';
 
 const poppins = Poppins({
   subsets: ['latin'],
@@ -20,7 +19,8 @@ const openSans = Open_Sans({
 
 export const metadata: Metadata = {
   title: 'Cybil Solutions | UAE Business Setup Consultancy',
-  description: 'Expert business setup services in Dubai and UAE. Fast, transparent, and hassle-free company formation with Cybil Solutions.',
+  description:
+    'Expert business setup services in Dubai and UAE. Fast, transparent, and hassle‑free company formation with Cybil Solutions.',
 };
 
 export default function RootLayout({
@@ -30,6 +30,12 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en">
+      {/* 👇 ONE extra line — tells the browser that every root‑relative URL
+          should be resolved under /landingpage/ */}
+      <head>
+        <base href="/landingpage/" />
+      </head>
+
       <body className={`${poppins.variable} ${openSans.variable} font-sans`}>
         {/* Google Tag Manager */}
         <Script
@@ -52,7 +58,8 @@ j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
             style={{ display: 'none', visibility: 'hidden' }}
           />
         </noscript>
-        {/* End Google Tag Manager (noscript) */}
+        {/* End Google Tag Manager */}
+
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
