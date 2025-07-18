@@ -1,18 +1,11 @@
-
-/** @type {import('next').NextConfig} */
-module.exports = {
-  // 1 — make the whole app live under /landingpage
-  basePath: '/landingpage',
-
-  // 2 — let …/landingpage and …/landingpage/ both resolve
+const nextConfig = {
+   basePath: '/landingpage',
   trailingSlash: true,
-
-  // 3 — static export for Netlify
   output: 'export',
-
-  // 4 — disable Next‑image optimisation (needed for static export)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: { unoptimized: true },
-
-  // 5 — skip ESLint during CI builds (optional)
-  eslint: { ignoreDuringBuilds: true },
 };
+
+module.exports = nextConfig;
