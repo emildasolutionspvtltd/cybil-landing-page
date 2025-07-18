@@ -15,6 +15,12 @@
   to = "/"
   status = 200
 
+# Handle SPA routing for Next.js static export
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
+
 # Headers for security
 [[headers]]
   for = "/*"
