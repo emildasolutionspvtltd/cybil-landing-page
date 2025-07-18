@@ -38,7 +38,7 @@ export default function ContactSection() {
 
       <div className="flex justify-center md:justify-end">
         <img
-          src="/business-men-services-pro-pic.png"
+          src="/landingpage/business-men-services-pro-pic.png"
           alt="Cybil Solutions"
           className="w-full max-w-sm md:max-w-md lg:max-w-lg h-auto object-contain"
         />
