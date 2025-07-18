@@ -1,5 +1,5 @@
 const nextConfig = {
-    basePath: '/landingpage/',
+    basePath: '/landingpage',
   output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
