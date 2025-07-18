@@ -59,10 +59,11 @@ export default function Testimonials() {
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full overflow-hidden">
                     <img 
-                      src={testimonial.image} 
-                      alt={testimonial.author}
-                      className="w-full h-full object-cover"
-                    />
+  src={`/landingpage${testimonial.image}`} 
+  alt={testimonial.author}
+  className="w-full h-full object-cover"
+/>
+
                   </div>
                   <div>
                     <div className="font-medium">{testimonial.author}</div>
