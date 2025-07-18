@@ -1,17 +1,10 @@
-
-module.exports = {
-  // 1 — make the whole app live under /landingpage
-  basePath: 'https://www.cybilsolutions.com/landingpage',
-
-  // 2 — let …/landingpage and …/landingpage/ both resolve
-  trailingSlash: true,
-
-  // 3 — static export for Netlify
+const nextConfig = {
+    basePath: 'https://www.cybilsolutions.com/landingpage/',
   output: 'export',
-
-  // 4 — disable Next‑image optimisation (needed for static export)
+  eslint: {
+    ignoreDuringBuilds: true,
+  },
   images: { unoptimized: true },
-
-  // 5 — skip ESLint during CI builds (optional)
-  eslint: { ignoreDuringBuilds: true },
 };
+
+module.exports = nextConfig;
