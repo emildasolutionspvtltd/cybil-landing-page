@@ -102,7 +102,7 @@ export default function ContactForm({ onSuccess }: ContactFormProps) {
         if (onSuccess) onSuccess();
       } else {
         // Submit to Netlify Forms in production
-        const response = await fetch('/', {
+        const response = await fetch('/landingpage/', {
           method: 'POST',
           headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
           body: new URLSearchParams(formData as any).toString(),
