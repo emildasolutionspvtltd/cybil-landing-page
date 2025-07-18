@@ -1,7 +1,7 @@
 
 module.exports = {
   // 1 — make the whole app live under /landingpage
-  basePath: '/landingpage',
+  basePath: 'https://www.cybilsolutions.com/landingpage',
 
   // 2 — let …/landingpage and …/landingpage/ both resolve
   trailingSlash: true,
