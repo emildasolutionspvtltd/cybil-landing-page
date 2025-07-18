@@ -75,7 +75,7 @@ export default function Hero() {
         <div className="container mx-auto px-3 sm:px-6 flex justify-between items-center h-10 sm:h-12">
           <div className="flex items-center gap-2 pt-1 sm:pt-2.5">
             <img
-              src="/business-men-services-pro-pic.png"
+              src="/testimonials/business-men-services-pro-pic.png"
               alt="Cybil Solutions"
               className="h-[120px] w-[140px] sm:h-[150px] sm:w-[170px] lg:h-[180px] lg:w-[200px]"
             />
