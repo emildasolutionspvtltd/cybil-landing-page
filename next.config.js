@@ -1,5 +1,5 @@
 const nextConfig = {
-    basePath: 'https://www.cybilsolutions.com/landingpage/',
+    basePath: '/landingpage/',
   output: 'export',
   eslint: {
     ignoreDuringBuilds: true,
